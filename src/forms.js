@@ -1,39 +1,32 @@
-
-
 const handleFillCountry = _.debounce((ev) => {
-    // only show matched events
-
     const node = ev.target.parentNode.getElementsByClassName('search-box')[0]
     node.style.display = 'initial'
     node.innerHTML = ''
 
     let inputText = ev.target.value.toLowerCase()
-    console.log(`search for ${inputText}`);
 
     for (let country of countryList) {
-        let row = document.createElement('div')
-        row.innerText = country
-        row.onclick = selectCountry
-
-        node.appendChild(row)
+        if (country.toLowerCase().includes(inputText)) {
+            let row = document.createElement('div')
+            row.innerText = country
+            row.onclick = selectCountry
+            node.appendChild(row)
+        }
     }
-  }, 300);
+}, 300);
 
-//
 function validateName(event) {
     const name = event.target.value
-    console.log('validate name: ' + name);
     
-    if (name.length <= 8 ){
-        showElementWithClassName(event.target, 'invalid-feedback')
-        hideElementWithClassName(event.target, 'valid-feedback')
-    }else if (name.length > 8){
+    if (name.length > 8) {
         showElementWithClassName(event.target, 'valid-feedback')
         hideElementWithClassName(event.target, 'invalid-feedback')
-    }else if (name.length = null) {
+        return true
+    } else {
         showElementWithClassName(event.target, 'invalid-feedback')
-    } 
-    return false
+        hideElementWithClassName(event.target, 'valid-feedback')
+        return false
+    }
 }
 
 function validatePassword(event) {
@@ -41,83 +34,72 @@ function validatePassword(event) {
     const Numeros = /[0-9]/.test(password)
     const Minusculas = /[a-z]/.test(password)
     const Mayusculas = /[A-Z]/.test(password)
-    console.log('validate password: ' + password);
-    const passwordCorrecto =  Numeros && password.length > 8 &&Minusculas && Mayusculas
+    
+    const passwordCorrecto = Numeros && password.length > 8 && Minusculas && Mayusculas
 
-    if(passwordCorrecto){
+    if (passwordCorrecto) {
         showElementWithClassName(event.target, 'valid-feedback')
         hideElementWithClassName(event.target, 'invalid-feedback')
-    }else {
+    } else {
         showElementWithClassName(event.target, 'invalid-feedback')
         hideElementWithClassName(event.target, 'valid-feedback')
     }
-
 
     return passwordCorrecto
 }
 
 function validateEmail(event) {
     const email = event.target.value
-    const regex = /^[^\s@] + @[^\s@]+\.[^\s@]+$/;
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const emailCorrecto = regex.test(email);
-    console.log('validate email: ' + email);
     
-    if (emailCorrecto){
-        showElementWithClassName(event.target, 'invalid-feedback')
-        hideElementWithClassName(event.target, 'valid-feedback')
-
-    }else if (emailCorrecto >3){
-        showElementWithClassName(event.target, 'invalid-feedback')
-    }else{
+    if (emailCorrecto) {
         showElementWithClassName(event.target, 'valid-feedback')
         hideElementWithClassName(event.target, 'invalid-feedback')
+        return true
+    } else {
+        showElementWithClassName(event.target, 'invalid-feedback')
+        hideElementWithClassName(event.target, 'valid-feedback')
+        return false
     }
-    return false
-    
-    
-
 }
 
-
-// general register
 function register(event) {
-    const email = event.target.value
-    const regex = /^[^\s@] + @[^\s@]+\.[^\s@]+$/;
-    const password = event.target.value
-    const name = event.target.value
+    event.preventDefault();
+    
+    const form = event.target;
+    const email = form.querySelector('input[type="email"]').value;
+    const password = form.querySelector('input[type="password"]').value;
+    const name = form.querySelector('input[type="text"]').value;
+    
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (email.length > 1, email.length = regex, password.length > 8, name.length > 8){
+    if (email.length > 1 && regex.test(email) && password.length > 8 && name.length > 8) {
         fetch('http://localhost:3000/', {
             method: 'POST',
             body: JSON.stringify({
-                'name': 'sample'
-                
+                'name': name,
+                'email': email
             }),
             headers: {
                 'Content-type': 'application/json'
             },
         })
-        event.preventDefault();
-        return false;
-
+        return true;
     }
-   
-    
+    return false;
 }
 
-// utility functions
-//nombre
 function showElementWithClassName(node, className) {
     node.parentNode.getElementsByClassName(className)[0].style.display = 'initial'
 }
+
 function hideElementWithClassName(node, className) {
     node.parentNode.getElementsByClassName(className)[0].style.display = 'none'
 }
 
 function selectCountry(event) {
-    console.log(event);
     document.forms[0].country.value = event.target.innerText
-
     const node = document.getElementsByClassName('search-box')[0]
     node.style.display = 'none'
     node.innerHTML = ''
@@ -133,7 +115,10 @@ function init() {
         item.style.display = 'none'
     }
 
-    document.getElementsByClassName('search-box')[0].style.display = 'none'
+    const searchBox = document.getElementsByClassName('search-box')[0]
+    if (searchBox) {
+        searchBox.style.display = 'none'
+    }
 }
 
 init()
