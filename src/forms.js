@@ -4,19 +4,20 @@ const handleFillCountry = _.debounce((ev) => {
     node.innerHTML = ''
 
     let inputText = ev.target.value.toLowerCase()
+    console.log(`search for ${inputText}`);
 
     for (let country of countryList) {
-        if (country.toLowerCase().includes(inputText)) {
-            let row = document.createElement('div')
-            row.innerText = country
-            row.onclick = selectCountry
-            node.appendChild(row)
-        }
+        let row = document.createElement('div')
+        row.innerText = country
+        row.onclick = selectCountry
+
+        node.appendChild(row)
     }
 }, 300);
 
 function validateName(event) {
     const name = event.target.value
+    console.log('validate name: ' + name);
     
     if (name.length > 8) {
         showElementWithClassName(event.target, 'valid-feedback')
@@ -34,6 +35,7 @@ function validatePassword(event) {
     const Numeros = /[0-9]/.test(password)
     const Minusculas = /[a-z]/.test(password)
     const Mayusculas = /[A-Z]/.test(password)
+    console.log('validate password: ' + password);
     
     const passwordCorrecto = Numeros && password.length > 8 && Minusculas && Mayusculas
 
@@ -52,6 +54,7 @@ function validateEmail(event) {
     const email = event.target.value
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const emailCorrecto = regex.test(email);
+    console.log('validate email: ' + email);
     
     if (emailCorrecto) {
         showElementWithClassName(event.target, 'valid-feedback')
@@ -65,41 +68,37 @@ function validateEmail(event) {
 }
 
 function register(event) {
-    event.preventDefault();
-    
-    const form = event.target;
-    const email = form.querySelector('input[type="email"]').value;
-    const password = form.querySelector('input[type="password"]').value;
-    const name = form.querySelector('input[type="text"]').value;
-    
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const email = event.target.value
+    const regex = /^[^\s@] + @[^\s@]+\.[^\s@]+$/;
+    const password = event.target.value
+    const name = event.target.value
 
-    if (email.length > 1 && regex.test(email) && password.length > 8 && name.length > 8) {
+    if (email.length > 1, email.length = regex, password.length > 8, name.length > 8){
         fetch('http://localhost:3000/', {
             method: 'POST',
             body: JSON.stringify({
-                'name': name,
-                'email': email
+                'name': 'sample'
             }),
             headers: {
                 'Content-type': 'application/json'
             },
         })
-        return true;
+        event.preventDefault();
+        return false;
     }
-    return false;
 }
 
 function showElementWithClassName(node, className) {
     node.parentNode.getElementsByClassName(className)[0].style.display = 'initial'
 }
-
 function hideElementWithClassName(node, className) {
     node.parentNode.getElementsByClassName(className)[0].style.display = 'none'
 }
 
 function selectCountry(event) {
+    console.log(event);
     document.forms[0].country.value = event.target.innerText
+
     const node = document.getElementsByClassName('search-box')[0]
     node.style.display = 'none'
     node.innerHTML = ''
@@ -115,10 +114,7 @@ function init() {
         item.style.display = 'none'
     }
 
-    const searchBox = document.getElementsByClassName('search-box')[0]
-    if (searchBox) {
-        searchBox.style.display = 'none'
-    }
+    document.getElementsByClassName('search-box')[0].style.display = 'none'
 }
 
 init()
